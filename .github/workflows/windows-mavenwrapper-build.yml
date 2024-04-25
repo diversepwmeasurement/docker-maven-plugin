@@ -1,27 +1,26 @@
-name: Windows Maven Wrapper Build
-
 env:
   MAVEN_ARGS: -B -C -V -ntp -Dhttp.keepAlive=false -e
-
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-
 jobs:
   build:
     name: Windows Java ${{ matrix.java }} Maven Wrapper
-    runs-on: windows-latest
+    runs-on: self-hosted
+    steps:
+    - continue-on-error: true
+      name: Checkout
+      uses: actions/checkout@v2
+    - continue-on-error: true
+      name: Setup Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - continue-on-error: true
+      name: Build Project
+      run: ./mvnw.cmd %MAVEN_ARGS% clean install
     strategy:
       matrix:
-        java: [11]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java }}
-      - name: Build Project
-        run: ./mvnw.cmd %MAVEN_ARGS% clean install
+        java:
+        - 11
+name: Windows Maven Wrapper Build
+on:
+  repository_dispatch:
+    types: trigger-ga___windows-mavenwrapper-build.yml
